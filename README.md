@@ -23,7 +23,7 @@ It responds to a `GET /{symbol}` REST request, where you pass in a stock ticker 
 a JSON object containing that *symbol*, the *price*, the *date* and the *time* it was quoted.  The *time*
 field is the number of milliseconds since the start of 1970 (used in determining quote staleness).
 
-For example, if you hit the `http://localhost:9080/stock-quote/IBM` URL, it would return
+For example, if you hit the `http://<hostname>:9080/stock-quote/IBM` URL, it would return
 `{"symbol": "IBM", "price": 155.23, "date": "2016-06-27", "time": 1467028800000}`.
 
 This service uses **Redis** for caching.  When a quote is requested, it first checks to see if it is
