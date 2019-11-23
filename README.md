@@ -33,28 +33,26 @@ usual, then adds it to **Redis** so it's there for next time.
 
 The *Java for Redis*, or **Jedis**, library is used for communicating with **Redis**.
 
+ ### Prerequisites for OCP Deployment
+ This project requires three secrets: `jwt`, `redis`, and `urls`.
  
- ### Build and Deploy to ICP
+ ### Build and Deploy to OCP
 To build `stock-quote` clone this repo and run:
-```bash
-mvn package
-docker build -t stock-quote:latest -t <ICP_CLUSTER>.icp:8500/stock-trader/stock-quote:latest .
-docker tag stock-quote:latest <ICP_CLUSTER>.icp:8500/stock-trader/stock-quote:latest
-docker push <ICP_CLUSTER>.icp:8500/stock-trader/stock-quote:latest
 ```
+cd templates
 
-Use WebSphere Liberty helm chart to deploy Stock Quote microservice to ICP:
-```bash
-helm repo add ibm-charts https://raw.githubusercontent.com/IBM/charts/master/repo/stable/
-helm install ibm-charts/ibm-websphere-liberty -f <VALUES_YAML> -n <RELEASE_NAME> --tls
-```
+oc create -f stock-quote-liberty-projects.yaml
 
-In practice this means you'll run something like:
-```bash
-docker build -t stock-quote:latest -t mycluster.icp:8500/stock-trader/stock-quote:latest .
-docker tag stock-quote:latest mycluster.icp:8500/stock-trader/stock-quote:latest
-docker push mycluster.icp:8500/stock-trader/stock-quote:latest
+oc create -f stock-quote-liberty-deploy.yaml -n stock-quote-liberty-dev
+oc create -f stock-quote-liberty-deploy.yaml -n stock-quote-liberty-stage
+oc create -f stock-quote-liberty-deploy.yaml -n stock-quote-liberty-prod
 
-helm repo add ibm-charts https://raw.githubusercontent.com/IBM/charts/master/repo/stable/
-helm install ibm-charts/ibm-websphere-liberty -f manifests/stock-quote-values.yaml -n stock-quote --namespace stock-trader --tls
+oc new-app stock-quote-liberty-deploy -n stock-quote-liberty-dev
+oc new-app stock-quote-liberty-deploy -n stock-quote-liberty-stage
+oc new-app stock-quote-liberty-deploy -n stock-quote-liberty-prod
+
+oc create -f stock-quote-liberty-build.yaml -n stock-quote-liberty-build
+
+oc new-app stock-quote-liberty-build -n stock-quote-liberty-build
+
 ```
